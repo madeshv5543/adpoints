@@ -27,8 +27,7 @@ var router = express.Router();
 router.get('/', function(req, res) {
   res.json({message: 'Welcome to app' })
 })
-require('./routers')(router);
-require('./auth')(router);
+require('./auth/auth')(router);
 app.use('/api', router);
 app.use((err, req, res, next) => {
   // handle unexpected errors
@@ -47,6 +46,19 @@ app.use((err, req, res, next) => {
   res.status(err.status).send(err);
 });
 
-app.listen(port);
-console.log('Magic happens on port ' + port);
+mongoose.connect('mongodb://user:password12@ds123173.mlab.com:23173/adpoint_db', { useNewUrlParser: true }, function(err) {
+    if(err) {
+    console.log("err",err)
+    }
+    else{
+        console.log('listening on 3000')
+    }
+    });
+    
+    // app.listen(3000, (err, user) => {
+    //     console.log("Server running on 3000");
+    //         })
+
+app.listen(3000);
+console.log('Magic happens on port ' + 3000);
 
