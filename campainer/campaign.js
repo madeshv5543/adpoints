@@ -79,8 +79,9 @@ module.exports = function(router) {
         }
     )
 
-    router.put('/camapign/:campaignId',
+    router.post('/camapign/:campaignId',
         verify,
+        upload.single('camimg'),
         (req, res) => {
             const { campaignId } = req.params;
             const requireParams = [
