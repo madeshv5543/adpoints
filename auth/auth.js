@@ -52,7 +52,8 @@ module.exports = function(router) {
                         const data = {
                             address: walletUtils.getWalletAddress(wallet),
                             pubkey: walletUtils.getWalletPublicKey(wallet),
-                            seed
+                            seed,
+                            accountType
                         };
                         const seedHash = encryptSeed(data.seed, password);
                         const user = new User({
@@ -111,7 +112,7 @@ module.exports = function(router) {
                             if (!isMatch || passwordErr){
                                     res.json( { message: 'Password is Incorrect.', status:400, type: 'failure' })
                                 }else{
-                                    let seedhash = user.seed;
+                                    let {seed:seedhash, accountType} = user;
                                     let seed = decryptSeed(seedhash, password);
                                     const wallet = walletUtils.getWallet(seed);
                                     const data = {

@@ -25,7 +25,7 @@ var port = process.env.port || portAddress;
 var router = express.Router();
 
 router.get('/', function(req, res) {
-  res.json({message: 'Welcome to app' })
+  res.json({message: 'Welcome to adpoints' })
 })
 require('./auth/auth')(router);
 app.use('/api', router);
