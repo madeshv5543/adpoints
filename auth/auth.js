@@ -12,10 +12,18 @@ function createToken(user, res) {
 }
 
 function encryptSeed(seed, password) {
+<<<<<<< HEAD
+=======
+    const encrypt = require('../utils/crypto');
+>>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
     return encrypt.encrypt('aes256', password, seed.toString());
 }
 
 function decryptSeed (seed, password) {
+<<<<<<< HEAD
+=======
+    const encrypt = require('../utils/crypto');
+>>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
     return encrypt.decrypt('aes256',password,seed)
 }
  
@@ -90,8 +98,13 @@ module.exports = function(router) {
             next()
         },
         (req,res,next) => {
+<<<<<<< HEAD
             req.body.address = req.body.email.toLowerCase();
             const { email, password } = req.body;
+=======
+            req.body.address = req.body.address.toLowerCase();
+            const {address : email, password } = req.body;
+>>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
             const User = require('../models/user');
 
             User.findOne({'email':email})

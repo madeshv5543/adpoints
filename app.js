@@ -49,6 +49,6 @@ app.use((err, req, res, next) => {
   res.status(err.status).send(err);
 });
 
-app.listen(3200);
-console.log('Magic happens on port ' + 3000);
+app.listen(portAddress);
+console.log('Magic happens on port ' + portAddress);
 
