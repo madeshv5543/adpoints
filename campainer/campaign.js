@@ -1,11 +1,13 @@
 const config = require('config');
 const verify = require('../middleware/verify');
-const Campaign =  require('../models/campaign'); 
+const Campaign =  require('../models/campaign');
+const upload = require('../utils/utils');
 
 module.exports = function(router) {
     router.post('/addCampaign',
-        verify,
+        upload.single('camimg'),
         (req, res) => {
+            const user = req.user;
             const requireParams = [
                 'title',
                 'description',
@@ -18,7 +20,8 @@ module.exports = function(router) {
             let isValid =  requireParams.reduce((acc, p) => (  acc & p in req.body), true)
             if(!isValid) {
                 return res.json({message: 'A require Param is not present ', status: 400, type: 'Failure'});
-            }
+            };
+            const {title, description, category, startdate, enddate, value, place} = req.body
             const newcampaign = new Campaign({
                 title,
                 description,
@@ -27,11 +30,11 @@ module.exports = function(router) {
                 enddate,
                 value,
                 place,
-                campaignImage,
-                user,
                 status:'pending'
             });
-
+            if(req.file){
+                newcampaign.campaignImage = req.file.filename
+            }
             newcampaign.save()
             .then(
                 doc => {

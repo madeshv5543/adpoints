@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const encrypt = (algorithm, password, text) => {
     const cipher = crypto.createCipher(algorithm, password);
@@ -15,5 +16,7 @@ const decrypt = (algorithm, password, encrypted) => {
     decrypted += decipher.final('utf8');
     return decrypted;
 }
+
+
 
 module.exports = {encrypt,decrypt};

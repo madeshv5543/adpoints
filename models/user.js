@@ -4,9 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new Schema({
     email: {
-        type: String,
-        required: [true, 'The email is required'],
-        unique:true
+        type: String
     },
     firstName: {
         type:String
@@ -15,13 +13,10 @@ const userSchema = new Schema({
         type:String
     },
     password: {
-        type:String,
-        required: [true, 'The password is required']
+        type:String
     },
     walletaddress: {
-        type:String,
-        required: [true, 'The address is required'],
-        unique: true
+        type:String
     },
     country: {
         type:String
@@ -45,7 +40,7 @@ const userSchema = new Schema({
         type: String
     },
     address: {
-        type: string
+        type: String
     },
     phoneNumber: {
         type:String
@@ -75,7 +70,7 @@ userSchema.methods.comparePassword = function comparePassword(password, callback
 /**
  * The pre-save hook method.
  */
-userSchema.pre('save', function saveHook(next) {
+userSchema.pre('save',function(next) {
     const user = this;
 
     // proceed further only if the password is modified or the user is new
