@@ -12,18 +12,10 @@ function createToken(user, res) {
 }
 
 function encryptSeed(seed, password) {
-<<<<<<< HEAD
-=======
-    const encrypt = require('../utils/crypto');
->>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
     return encrypt.encrypt('aes256', password, seed.toString());
 }
 
 function decryptSeed (seed, password) {
-<<<<<<< HEAD
-=======
-    const encrypt = require('../utils/crypto');
->>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
     return encrypt.decrypt('aes256',password,seed)
 }
  
@@ -56,24 +48,25 @@ module.exports = function(router) {
                     }else{
                         const seed  = lightwallet.keystore.generateRandomSeed();
                         const wallet = walletUtils.getWallet(seed);
-                        const data = {
-                            address: walletUtils.getWalletAddress(wallet),
-                            pubkey: walletUtils.getWalletPublicKey(wallet),
-                            seed,
-                            accountType
-                        };
-                        const seedHash = encryptSeed(data.seed, password);
+                        const seedHash = encryptSeed(seed, password);
+                        const address =walletUtils.getWalletAddress(wallet)
                         const user = new User({
                             email,
                             password,
-                            walletaddress: data.address,
+                            walletaddress:address,
                             seed:seedHash,
                             accountType
                         })
+                        const data = {
+                            address,
+                            pubkey: walletUtils.getWalletPublicKey(wallet),
+                            seed:seedHash,
+                            accountType
+                        };
                         user.save()
                         .then( result => {
                                 token = createToken({address: data.address, seed: seedHash, phrase:password, accountType}, res);
-                                res.json({data, token, status: 200, type: 'Success'});
+                                res.json({data, token, seed,  status: 200, type: 'Success'});
                             },err=>{
                                 res.json({message: err, status: 400, type: "Failure"})
                             }
@@ -98,13 +91,8 @@ module.exports = function(router) {
             next()
         },
         (req,res,next) => {
-<<<<<<< HEAD
-            req.body.address = req.body.email.toLowerCase();
+            req.body.email = req.body.email.toLowerCase();
             const { email, password } = req.body;
-=======
-            req.body.address = req.body.address.toLowerCase();
-            const {address : email, password } = req.body;
->>>>>>> 938e1ab5f804b61f8ccc18bb0f6ef0c80d465324
             const User = require('../models/user');
 
             User.findOne({'email':email})

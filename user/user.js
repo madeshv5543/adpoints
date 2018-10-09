@@ -6,13 +6,14 @@ module.exports = function(router) {
     router.get('/user',
         verify,
         (req, res) => {
-            const { user } = req.user;
+            const { user } = req;
             User.findOne({"walletaddress":user.address})
             .then(
                 userDetails => {
                     if(!userDetails){
                         return res.json({ message: 'User Not found', status: 401, type: 'Failure' })
                     }
+                    return res.json({data:userDetails, status:200, type:'Success' } )
                 },
                 err =>{
                     return res.json({ message: 'User details cannot find . please try again later', status: 500, type: 'Failure'})

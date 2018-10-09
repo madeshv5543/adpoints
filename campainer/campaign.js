@@ -54,7 +54,7 @@ module.exports = function(router) {
             .then( docs => {
                 return res.json({data: docs, status: 200, type: 'Success'})
             },
-            err =>{
+            err => {
                 return res.json({message: 'Cannot get campaign list. Try after sometime', status:500, type: 'Failure'})
             })
         }

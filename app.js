@@ -1,11 +1,11 @@
 const config = require('config');
-const provider =   config.get('etheriumhost'); 
-const apikey = config.get('apiKey');
+// const provider =   config.get('etheriumhost'); 
+// const apikey = config.get('apiKey');
 const portAddress = config.get('port');
-const Tx = require('ethereumjs-tx');
-const web3 = require('./utils/web3.singleton')(`${provider}`);
+// const Tx = require('ethereumjs-tx');
+// const web3 = require('./utils/web3.singleton')(`${provider}`);
 const rinky = config.get('provider');
-const mainNetwork = require('./utils/mainnetwork')(`${rinky}/${apikey}`)
+// const mainNetwork = require('./utils/mainnetwork')(`${rinky}/${apikey}`)
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -31,6 +31,7 @@ router.get('/', function(req, res) {
 })
 require('./auth/auth')(router);
 require('./campainer/campaign')(router);
+require('./user/user')(router);
 app.use('/api', router);
 app.use((err, req, res, next) => {
   // handle unexpected errors
