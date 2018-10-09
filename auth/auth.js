@@ -3,6 +3,7 @@ const walletUtils = require('../utils/wallet');
 const lightwallet = require("eth-lightwallet");
 const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken'); 
+const encrypt = require('../utils/crypto');
 
 function createToken(user, res) {
     return jwt.sign(user, config.secret, {
@@ -11,12 +12,10 @@ function createToken(user, res) {
 }
 
 function encryptSeed(seed, password) {
-    const encrypt = require('./utils/crypto');
     return encrypt.encrypt('aes256', password, seed.toString());
 }
 
 function decryptSeed (seed, password) {
-    const encrypt = require('./utils/crypto');
     return encrypt.decrypt('aes256',password,seed)
 }
  
@@ -33,12 +32,12 @@ module.exports = function(router) {
                 next({message: 'Account type is Required.', status:400, type: "Failure"})
             };
             if(req.body.password != req.body.confirmPassword) {
-                next({message: 'password and Confirmpassowrd  is Mismatch.', status:400, type: "Failure"})
+                next({message: 'password and Confirmpassword  is Mismatch.', status:400, type: "Failure"})
             }
             next();
         },
         function(req, res, next) {
-            const User = require('./models/user');
+            const User = require('../models/user');
             req.body.email = req.body.email.toLowerCase();
             const { email,  password, accountType} = req.body;
             User.findOne({'email':email})
@@ -49,23 +48,25 @@ module.exports = function(router) {
                     }else{
                         const seed  = lightwallet.keystore.generateRandomSeed();
                         const wallet = walletUtils.getWallet(seed);
-                        const data = {
-                            address: walletUtils.getWalletAddress(wallet),
-                            pubkey: walletUtils.getWalletPublicKey(wallet),
-                            seed,
-                            accountType
-                        };
-                        const seedHash = encryptSeed(data.seed, password);
+                        const seedHash = encryptSeed(seed, password);
+                        const address =walletUtils.getWalletAddress(wallet)
                         const user = new User({
                             email,
                             password,
-                            walletaddress:data.address,
-                            seed:seedHash
+                            walletaddress:address,
+                            seed:seedHash,
+                            accountType
                         })
+                        const data = {
+                            address,
+                            pubkey: walletUtils.getWalletPublicKey(wallet),
+                            seed:seedHash,
+                            accountType
+                        };
                         user.save()
                         .then( result => {
-                                token = createToken({address: data.address, seed: seedHash, phrase:password}, res);
-                                res.json({data, token, status: 200, type: 'Success'});
+                                token = createToken({address: data.address, seed: seedHash, phrase:password, accountType}, res);
+                                res.json({data, token, seed,  status: 200, type: 'Success'});
                             },err=>{
                                 res.json({message: err, status: 400, type: "Failure"})
                             }
@@ -81,7 +82,7 @@ module.exports = function(router) {
 
     router.post('/login',
         (req,res,next) => {
-            if( !('address' in req.body) ){
+            if( !('email' in req.body) ){
                 next({message: 'Email is Required', status:400, type: 'failure'})
             };
             if( !('password' in req.body) ){
@@ -90,9 +91,9 @@ module.exports = function(router) {
             next()
         },
         (req,res,next) => {
-            req.body.address = req.body.address.toLowerCase();
-            const {address : email, password } = req.body;
-            const User = require('./models/user');
+            req.body.email = req.body.email.toLowerCase();
+            const { email, password } = req.body;
+            const User = require('../models/user');
 
             User.findOne({'email':email})
                 .then((user) => {
@@ -118,9 +119,10 @@ module.exports = function(router) {
                                     const data = {
                                         address: walletUtils.getWalletAddress(wallet),
                                         pubkey: walletUtils.getWalletPublicKey(wallet),
-                                        seed: seedhash
+                                        seed: seedhash,
+                                        accountType
                                     };
-                                    token = createToken({address: data.address, seed: seedhash, phrase:password}, res);
+                                    token = createToken({address: data.address, seed: seedhash, phrase:password, accountType}, res);
                                     res.json({data, token, status: 200, type: 'success'})
                                 }
                         }
