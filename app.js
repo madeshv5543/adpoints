@@ -1,9 +1,9 @@
 const config = require('config');
-// const provider =   config.get('etheriumhost'); 
+const provider =   config.get('etheriumhost'); 
 // const apikey = config.get('apiKey');
 const portAddress = config.get('port');
 // const Tx = require('ethereumjs-tx');
-// const web3 = require('./utils/web3.singleton')(`${provider}`);
+const web3 = require('./utils/web3.singleton')(`${provider}`);
 const rinky = config.get('provider');
 // const mainNetwork = require('./utils/mainnetwork')(`${rinky}/${apikey}`)
 const express = require('express');
@@ -15,7 +15,7 @@ const cors = require('cors');
 app.use(cors(config.cors))
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json())
-app.use(express.static(__dirname + '/public'));
+app.use('/static',express.static(__dirname + '/public'));
 mongoose.set('useCreateIndex', true)
 mongoose.connect(config.mongoUri, { useNewUrlParser: true }, function(err) {
 if(err) {
@@ -31,6 +31,7 @@ router.get('/', function(req, res) {
 })
 require('./auth/auth')(router);
 require('./campainer/campaign')(router);
+require('./sponsers/sponser')(router)
 require('./user/user')(router);
 app.use('/api', router);
 app.use((err, req, res, next) => {

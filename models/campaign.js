@@ -13,10 +13,10 @@ const campaignSchema = new Schema({
         type: String
     },
     startdate : {
-        type: String
+        type: Date
     },
     enddate: {
-        type: String
+        type: Date
     },
     value: {
         type: Number
@@ -36,10 +36,16 @@ const campaignSchema = new Schema({
     txhash: {
         type: String
     },
+    status: {
+
+    },
     created: {
         type: Date,
         default: Date.now
-    }
+    },
+    events: [{
+        type:Schema.Types.ObjectId, ref: 'Event'
+    }]
 });
 
 module.exports = mongoose.model('Campaign', campaignSchema);

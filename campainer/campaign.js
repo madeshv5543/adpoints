@@ -1,13 +1,17 @@
 const config = require('config');
 const verify = require('../middleware/verify');
 const Campaign =  require('../models/campaign');
+const User = require('../models/user');
+const Event = require('../models/events');
 const upload = require('../utils/utils');
+const mongoose = require('mongoose')
 
 module.exports = function(router) {
     router.post('/addCampaign',
+        verify,
         upload.single('camimg'),
         (req, res) => {
-            const user = req.user;
+            const { user } = req;
             const requireParams = [
                 'title',
                 'description',
@@ -30,15 +34,16 @@ module.exports = function(router) {
                 enddate,
                 value,
                 place,
-                status:'pending'
+                status:'Pending'
             });
             if(req.file){
                 newcampaign.campaignImage = req.file.filename
             }
+            newcampaign.user = user.address
             newcampaign.save()
             .then(
                 doc => {
-                    return res.json({message: 'Campaign saved successfully', status: 200, type: 'Success'})
+                    return res.json({message: 'Campaign added successfully', status: 200, type: 'Success'})
                 },
                 err => {
                     return res.json({message: 'Cannot save a campaign details. Try after sometime', status:500, type: 'Failure'})
@@ -46,6 +51,25 @@ module.exports = function(router) {
             )
         }
     );
+
+   router.get('/mycampaigns',
+        verify,
+        (req, res) => {
+            const { user } = req;
+            let params = {
+                user:user.address
+            }
+            Campaign.find(params)
+            .then(
+                docs => {
+                    return res.json({data:docs, status:200, type:'success'})
+                },
+                err => {
+                    return res.json({message: 'Cannot get campaign list. Try after sometime', status:500, type: 'Failure'})
+                }
+            )
+        }
+   ) 
 
     router.get('/campaigns',
         verify,
@@ -79,7 +103,7 @@ module.exports = function(router) {
         }
     )
 
-    router.post('/camapign/:campaignId',
+    router.post('/updateCampaign/:campaignId',
         verify,
         upload.single('camimg'),
         (req, res) => {
@@ -92,7 +116,11 @@ module.exports = function(router) {
                 'enddate',
                 'value',
                 'place'
-            ];
+            ]; 
+            let campaigndata = req.body
+            if(req.file) {
+                campaigndata.campaignImage = req.file.filename
+            }
             let isValid =  requireParams.reduce((acc, p) => (  acc & p in req.body), true)
             if(!isValid) {
                 return res.json({message: 'A require Param is not present ', status: 400, type: 'Failure'});
@@ -102,14 +130,10 @@ module.exports = function(router) {
                 if(!doc) {
                     return res.json({message: "Cannot find camapign details", status: '204', type: 'Failure'})
                 }
-                Object.keys(doc).map( n => {
-                    if(doc[n] !== req.body[n]) {
-                        doc[n] = req.body[n]
-                    }
-                });
-                doc.save()
+                Campaign.findByIdAndUpdate(campaignId, campaigndata)
                 .then( saveres => {
-                    return res.json({message: 'Campaign details updated successfully', status: 200, type: 'Success'})
+                    console.log("res",saveres)
+                    return res.json({data:saveres, status: 200, type: 'Success'})
                 },
                 err => {
                     return res.json({message: 'Cannot update campaign details. Try after sometime', status:500, type: 'Failure'})
@@ -118,6 +142,146 @@ module.exports = function(router) {
             err => {
                 return res.json({message: 'Cannot update campaign details. Try after sometime', status:500, type: 'Failure'})
             })
+        }
+    )
+
+    router.get('/allcampaigns',
+        verify,
+        (req, res) => {
+            Campaign.find({})
+            .then( 
+                docs => {
+                    return res.json({data:docs, status:200, type:"Success"})
+                },
+                err => {
+                    return res.json({data:[], status:200, type:"Success"})
+                }
+            )
+        }
+    )
+
+    router.get('/campaigndetails/:id',
+        verify,
+        (req, res) => {
+            const {id} = req.params;
+            Campaign.findById(id).lean()
+            .populate('events')
+            .then(
+                doc => {
+                    if(!doc) {
+                        return res.json({message:"cannot find the campoaign details", status:400, type:"Failure"})
+                    }
+                    User.findOne({walletaddress:doc.user}).lean()
+                    .then(
+                        user => {
+                            if(!user) {
+                                return res.json({message: 'Cannot get campaign user details', status: 403, type:"Failure"})
+                            }
+                            let campaigndetails = {
+                                ...doc,
+                                user
+                            }
+                            return res.json({data:campaigndetails, status:200, type:"Success"})
+                        },
+                        err => {
+                            return res.json({message: 'Cannot get campaign user details', status: 403, type:"Failure"})
+                        }
+                    )
+                },
+                err => {
+                    return res.json({message:`can't get campaign details`, status:400, type:"Failure"})
+                }
+            )
+        }
+    )
+
+    router.get('/usercampaigndetails/:id',
+        verify,
+        (req, res) => {
+            const {id} = req.params;
+            Campaign.findById(id).lean()
+            .populate('events')
+            .then(
+                doc => {
+                    if(!doc) {
+                        return res.json({message:"cannot find the campoaign details", status:400, type:"Failure"})
+                    }
+                    if(doc.sponser) {
+                        User.findOne({walletaddress:doc.sponser}).lean()
+                        .then(
+                            user => {
+                                if(!user) {
+                                    return res.json({message: 'Cannot get campaign user details', status: 403, type:"Failure"})
+                                }
+                                let campaigndetails = {
+                                    ...doc,
+                                    user
+                                }
+                                return res.json({data:campaigndetails, status:200, type:"Success"})
+                            },
+                            err => {
+                                return res.json({message: 'Cannot get campaign user details', status: 403, type:"Failure"})
+                            }
+                        )
+                    }else {
+                        return res.json({data:doc, status:200, type:"Success"})
+                    }
+                },
+                err => {
+                    return res.json({message:`can't get campaign details`, status:400, type:"Failure"})
+                }
+            )
+        }
+    )
+    router.post('/addevent',
+        verify,
+        upload.single('eventimg'),
+        (req, res) => {
+            const user = req;
+            const {
+                title,
+                description,
+                id
+            } = req.body;
+            let tdate = new Date();
+            let filename = req.file.filename;
+            let newEvent = new Event(
+                {
+                    title,
+                    description,
+                    campaign:id,
+                    image:filename
+                }
+            )
+            newEvent.save()
+            .then(
+                event => {
+                    Campaign.findById(id)
+                    .then(
+                        camp => {
+                            if(!camp) {
+                                return res.json({message: "Cannpt add the event.", status:400, type:'Failure' })
+                            }
+                            camp.events.push(event)
+                            camp.save()
+                            .then(
+                                camd => {
+                                    return res.json({message:'Event added to the Campaign successfully.', status:200, type:'Success'})
+                                },
+                                err => {
+                                    return res.json({message: "Cannpt add the event.", status:400, type:'Failure' })
+                                }
+                            )
+                        },
+                        err => {
+
+                        }
+                    )
+                },
+                err => {
+                    return res.json({message: "Cannpt add the event.", status:400, type:'Failure' })
+                }
+            )
         }
     )
 }

@@ -9,10 +9,11 @@ const transactionSchema = new Schema({
     },
     from: String,
     to: String,
-    token: String,
     value : String,
     timestamp : String,
-    nonce: String
+    nonce: String,
+    campaign: String,
+    nonce:String
 })
 
 module.exports = mongoose.model('transaction', transactionSchema);
