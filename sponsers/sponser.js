@@ -1,6 +1,11 @@
 const config = require('config');
 const verify = require('../middleware/verify');
 const Campaign =  require('../models/campaign');
+const provider =   config.get('etheriumhost'); 
+const web3 = require('../utils/web3.singleton')(`${provider}`);
+const tokenOneAbi = config.get('indabi');
+const icontractAddress = config.get('indcontractAddress');
+const inContract =  web3.eth.contract(tokenOneAbi).at(icontractAddress)
 
 module.exports = function(router) {
     router.get('/sponsercampaign',
@@ -22,11 +27,21 @@ module.exports = function(router) {
         verify,
         (req, res) =>{ 
             const { campaignId } = req.params;
+            const { activeTotal } = req.body;
             const {user} = req;
+            let balance;
+            try{
+                 balance = inContract.balanceOf(user.address);
+            }catch(e) {
+                return res.json({message: 'Cannot get user balance', status: 400, type: "Failure"})
+            }
             Campaign.findById(campaignId)
             .then(
                 dbres => {
                     //
+                    if(balance - activeTotal < dbres.value) {
+                        return res.json({ message: "Insufficient balance", status:400, type:'Failure' })
+                    }
                     if(!dbres) {
                         return res.json({ message: "cannot find campaign details", status:401, type:'Failure' })
                     };
