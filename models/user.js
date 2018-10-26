@@ -15,8 +15,10 @@ const userSchema = new Schema({
     password: {
         type:String
     },
-    walletaddress: {
-        type:String
+    address: {
+        type:String,
+        required: [true, 'The address is required'],
+        unique: true
     },
     country: {
         type:String
@@ -39,7 +41,7 @@ const userSchema = new Schema({
     pincode : {
         type: String
     },
-    address: {
+    physicaladdress: {
         type: String
     },
     phoneNumber: {

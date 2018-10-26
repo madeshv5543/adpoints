@@ -33,7 +33,7 @@ module.exports = function(router) {
         verify,
         (req, res) => {
             const { user } = req;
-            User.findOne({"walletaddress":user.address})
+            User.findOne({"address":user.address})
             .then(
                 userDetails => {
                     if(!userDetails){
@@ -85,13 +85,13 @@ module.exports = function(router) {
             if('fieldname2' in req.body){
                 delete userUpdateDetails.fieldname2
             }
-            User.findOne({"walletaddress":user.address})
+            User.findOne({"address":user.address})
             .then(
                 userDetails => {
                     if(!userDetails){
                         return res.json({ message: 'User Not found', status: 401, type: 'Failure' })
                     }
-                    User.findOneAndUpdate({"walletaddress":user.address},userUpdateDetails)
+                    User.findOneAndUpdate({"address":user.address},userUpdateDetails)
                         .then( doc => {
                             return res.json({ message: "User details updated successfully.", status: 200, type:'Success' })
                         },

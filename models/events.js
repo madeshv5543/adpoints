@@ -7,6 +7,7 @@ const eventSchema = new Schema({
         default:new Date
     },
     title: String,
+    from: String,
     description:String,
     image:String,
     campaign:{
