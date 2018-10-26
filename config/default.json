@@ -3,7 +3,7 @@
     "provider": "https://rinkeby.infura.io",
     "mongoUri": "mongodb://user:password1@ds147361.mlab.com:47361/enswallet",
     "secret":"evenswallet",
-    "port":3200,
+    "port":3000,
     "wallet": {
         "primary": {
             "address": "0x1E8A1E3423214a4b78BFA87440709867e6163615",
