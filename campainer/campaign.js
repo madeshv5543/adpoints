@@ -233,6 +233,54 @@ module.exports = function(router) {
             )
         }
     )
+        
+    router.post('/addImages/:campaignId',
+        verify,
+        upload.any(),
+        (req, res) => {
+            const {user} = req;
+            const campaignId = req.params.campaignId;
+            let imagesArray =[];
+            if(req.files.length) {
+                for(let i=0;i<req.files.length;i++) {
+                    imagesArray.push(req.files[i].filename);
+                }
+            }
+            if(!imagesArray.length) {
+                return res.json({message:'No files uploaded', status:400, type:'Failure'})
+            }
+            Campaign.findByIdAndUpdate(campaignId,{ $push : { images : { $each : imagesArray } } })
+            .then(result=> {
+                return res.json({data:imagesArray, status:200, type:'Success'})
+            },
+            err => {
+                return res.json({message:'Cannot update the imges', status:400, type:'Failure'})
+            })
+        }
+    )
+
+    router.post('/deleteimgs/:campaignId',
+        verify,
+        (req, res) => {
+            const { images } = req.body;
+            if(!images || !images.length){
+                return res.json({message: 'No images added to delete', status:400, type:'Failure'})
+            }
+            let {campaignId} = req.params;
+            Campaign.findByIdAndUpdate(campaignId, {
+                $pull: { images: { $in : images}   }
+            })
+            .then(
+                result => {
+                    return res.json({message: 'Images removed.', status: 200, type:'Success'})
+                },
+                err => {
+                    return res.json({message: 'Cannot remove the images', status: 400, type:'Failure' })
+                }
+            )
+        }
+    )
+
     router.post('/addevent',
         verify,
         upload.single('eventimg'),
