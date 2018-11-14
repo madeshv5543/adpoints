@@ -8,7 +8,6 @@ const encrypt = (algorithm, password, text) => {
     encrypted += cipher.final('hex');
     return encrypted;
 };
-
 const decrypt = (algorithm, password, encrypted) => {
     const decipher = crypto.createDecipher(algorithm, password);
 
@@ -16,7 +15,4 @@ const decrypt = (algorithm, password, encrypted) => {
     decrypted += decipher.final('utf8');
     return decrypted;
 }
-
-
-
 module.exports = {encrypt,decrypt};

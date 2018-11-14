@@ -6,6 +6,7 @@ module.exports = function(router) {
     router.get('/sponsercampaign',
         verify,
         (req, res) => {
+            
             Campaign.find({sponser: user._id})
             .then (
                 campaigns => {
@@ -17,7 +18,6 @@ module.exports = function(router) {
             )
         }
     ),
-
     router.post('/sponsercampaign/:campaignId',
         verify,
         (req, res) =>{ 
@@ -26,13 +26,12 @@ module.exports = function(router) {
             Campaign.findById(campaignId)
             .then(
                 dbres => {
-                    //
                     if(!dbres) {
                         return res.json({ message: "cannot find campaign details", status:401, type:'Failure' })
                     };
                     Campaign.findOneAndUpdate({_id:dbres._id},{'sponser':user.address, 'status':'Active'})
                     .then( camp => {
-                        return res.json({message:'Campaign added to your sponser list', status:200, type:'Success'})
+                        return res.json({ message:'Campaign added to your sponser list', status:200, type:'Success'})
                     },
                     err => {
                         return res.json({ message: "cannot update campaign details", status:400, type:'Failure' })
@@ -61,14 +60,14 @@ module.exports = function(router) {
             .then(
                 totalvalue => {
                     if(totalvalue.length) {
-                      return  res.json({
-                            data:totalvalue[0].count,
+                      return res.json({
+                            data: totalvalue[0].count,
                             status: 200,
                             type: "Success"
                         })
                     }else {
                         return  res.json({
-                            data:0,
+                            data: 0,
                             status: 200,
                             type: "Success"
                         })

@@ -49,4 +49,3 @@ const campaignSchema = new Schema({
 });
 
 module.exports = mongoose.model('Campaign', campaignSchema);
-

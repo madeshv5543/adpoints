@@ -155,9 +155,9 @@ module.exports = function(router) {
             const skey = walletUtils.getWalletPrivateKey(wallet)
             amount= amount * 1e18;
             const secret = new Buffer(skey, 'hex');
-            const rawTransaction = {  
+            const rawTransaction = {
                 "nonce": checkhex(web3.toHex(web3.eth.getTransactionCount(address))),
-                "gasPrice": 0, 
+                "gasPrice": 0,
                 "gasLimit": "0x0153df",
                 "to": icontractAddress,
                 "value": '0x00',

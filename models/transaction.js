@@ -9,7 +9,7 @@ const transactionSchema = new Schema({
     },
     from: String,
     to: String,
-    value : String,
+    value: String,
     timestamp : String,
     nonce: String,
     campaign: String,

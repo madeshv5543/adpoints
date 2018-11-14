@@ -35,7 +35,6 @@ module.exports = function(router) {
                 value,
                 place,
                 status:'Pending',
-                
             });
             if(req.file){
                 newcampaign.campaignImage = req.file.filename
@@ -205,7 +204,7 @@ module.exports = function(router) {
             .then(
                 doc => {
                     if(!doc) {
-                        return res.json({message:"cannot find the campaign details", status:400, type:"Failure"})
+                        return res.json({message:"cannot find the campoaign details", status:400, type:"Failure"})
                     }
                     if(doc.sponser) {
                         User.findOne({walletaddress:doc.sponser}).lean()
@@ -238,22 +237,23 @@ module.exports = function(router) {
         verify,
         upload.single('eventimg'),
         (req, res) => {
-            const user = req;
+            const { user } = req;
             const {
                 title,
                 description,
                 id
             } = req.body;
             let tdate = new Date();
-            let filename = req.file.filename;
             let newEvent = new Event(
                 {
                     title,
                     description,
                     campaign:id,
-                    image:filename
+                    from:user.address
                 }
             )
+            if(req.file)
+            newEvent.image = req.file.filename
             newEvent.save()
             .then(
                 event => {
@@ -285,4 +285,4 @@ module.exports = function(router) {
             )
         }
     )
-}
+}	
