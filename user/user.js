@@ -69,9 +69,9 @@ module.exports = function(router) {
             if(userUpdateDetails.fieldname2 && userUpdateDetails.fieldname1){
                 userUpdateDetails.filename2 = req.files[1].filename;
             }
-            if(userUpdateDetails.filename2 && !userUpdateDetails.fieldname1) {
-                userUpdateDetails.filename2 = req.files[0].filename;
-            }
+            // if(userUpdateDetails.filename2 && !userUpdateDetails.fieldname1) {
+            //     userUpdateDetails.filename2 = req.files[0].filename;
+            // }
             if('fieldname1' in req.body){
                 delete userUpdateDetails.fieldname1
             }

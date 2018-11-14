@@ -19,7 +19,7 @@ module.exports = function(router) {
                 'startdate',
                 'enddate',
                 'value',
-                'place'
+                'place',
             ];
             let isValid =  requireParams.reduce((acc, p) => (  acc & p in req.body), true)
             if(!isValid) {
@@ -34,7 +34,8 @@ module.exports = function(router) {
                 enddate,
                 value,
                 place,
-                status:'Pending'
+                status:'Pending',
+                
             });
             if(req.file){
                 newcampaign.campaignImage = req.file.filename
@@ -204,7 +205,7 @@ module.exports = function(router) {
             .then(
                 doc => {
                     if(!doc) {
-                        return res.json({message:"cannot find the campoaign details", status:400, type:"Failure"})
+                        return res.json({message:"cannot find the campaign details", status:400, type:"Failure"})
                     }
                     if(doc.sponser) {
                         User.findOne({walletaddress:doc.sponser}).lean()
