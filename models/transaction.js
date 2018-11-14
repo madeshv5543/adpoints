@@ -16,4 +16,4 @@ const transactionSchema = new Schema({
     nonce:String
 })
 
-module.exports = mongoose.model('transaction', transactionSchema);
+module.exports = mongoose.model('campaigntransaction', transactionSchema);

@@ -39,6 +39,7 @@ const campaignSchema = new Schema({
     status: {
 
     },
+    images :[],
     created: {
         type: Date,
         default: Date.now

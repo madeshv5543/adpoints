@@ -8,6 +8,12 @@ const web3 = require('../utils/web3.singleton')(`${provider}`);
 const Campaign =  require('../models/campaign');
 const walletUtils= require('../utils/wallet');
 const tokenOneAbi = config.get('indabi');
+const Tx = require('ethereumjs-tx');
+function decryptSeed (seed, password) {
+    const encrypt = require('../utils/crypto');
+    return encrypt.decrypt('aes256',password,seed)
+}
+
 function checkhex (word) {
     console.log('before add', word)
     if(word.length % 2 != 0){
@@ -27,7 +33,7 @@ module.exports = function(router) {
         verify,
         (req, res) => {
             const { user } = req;
-            User.findOne({"walletaddress":user.address})
+            User.findOne({"address":user.address})
             .then(
                 userDetails => {
                     if(!userDetails){
@@ -48,8 +54,9 @@ module.exports = function(router) {
             const { user} = req;
             let balance;
             try{
-                 balance = web3.eth.getBalance(user.address);
+                 balance = inContract.balanceOf(user.address);
             }catch(e) {
+                console.log("err",e)
                 return res.json({message: 'Cannot get user balance', status: 400, type: "Failure"})
             }
             balance = balance ? balance/1e18:0
@@ -78,13 +85,13 @@ module.exports = function(router) {
             if('fieldname2' in req.body){
                 delete userUpdateDetails.fieldname2
             }
-            User.findOne({"walletaddress":user.address})
+            User.findOne({"address":user.address})
             .then(
                 userDetails => {
                     if(!userDetails){
                         return res.json({ message: 'User Not found', status: 401, type: 'Failure' })
                     }
-                    User.findOneAndUpdate({"walletaddress":user.address},userUpdateDetails)
+                    User.findOneAndUpdate({"address":user.address},userUpdateDetails)
                         .then( doc => {
                             return res.json({ message: "User details updated successfully.", status: 200, type:'Success' })
                         },
@@ -138,11 +145,11 @@ module.exports = function(router) {
             
         },
         (req, res) => {
-            const { from, to, value:amount, campaign, password} = req.body;
+            let { from, to, value:amount, campaign, password} = req.body;
             const { user } = req;
             let balance;
             try{
-                 balance = web3.eth.getBalance(user.address);
+                 balance = inContract.balanceOf(user.address);
             }catch(e) {
                 return res.json({message: 'Cannot get user balance', status: 400, type: "Failure"})
             }
@@ -175,8 +182,8 @@ module.exports = function(router) {
                             hash: result,
                             from: address,
                             nonce: web3.eth.getTransactionCount(address),
-                            to: req.body.transferTo,
-                            value: req.body.amount,
+                            to,
+                            value: amount / 1e18,
                             timestamp: Date.now(),
                             campaign:campaign
                         })

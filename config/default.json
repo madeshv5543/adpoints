@@ -1,9 +1,13 @@
 {
     "apiKey": "aTgfvD01IJzD0flVKXPM",
     "provider": "https://rinkeby.infura.io",
+<<<<<<< HEAD
     "mongoUri": "mongodb://user:password12@ds123173.mlab.com:23173/adpoint_db",
+=======
+    "mongoUri": "mongodb://user:password1@ds147361.mlab.com:47361/enswallet",
+>>>>>>> 5ec4fdf3dc949ca48f8cf736ab551e8484fdeba6
     "secret":"evenswallet",
-    "port":3200,
+    "port":3000,
     "wallet": {
         "primary": {
             "address": "0x1E8A1E3423214a4b78BFA87440709867e6163615",

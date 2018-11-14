@@ -53,7 +53,7 @@ module.exports = function(router) {
                         const user = new User({
                             email,
                             password,
-                            walletaddress:address,
+                            address,
                             seed:seedHash,
                             accountType
                         })
@@ -102,6 +102,16 @@ module.exports = function(router) {
                       return  res.json(
                             {
                                 message: 'User not found with this email.',
+                                status: 404,
+                                type: 'failure'
+                            }
+                        )
+                    }
+
+                    if(!user.accountType) {
+                        return  res.json(
+                            {
+                                message: 'User not have access to this site',
                                 status: 404,
                                 type: 'failure'
                             }

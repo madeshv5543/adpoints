@@ -8,6 +8,7 @@ const eventSchema = new Schema({
     },
     from: String,
     title: String,
+    from: String,
     description:String,
     image:String,
     campaign:{
